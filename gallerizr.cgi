@@ -40,6 +40,16 @@ __DATA__
   <style>
     html { overflow-y: scroll; }
     body { position: relative; margin: 0; background-color: #151515 }
+    #browser {
+      display: none;
+      margin: 0;
+      height: 100vh;
+    }
+    #browser img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
   </style>
   <script>
     const images = [ <%= join(",\n", map { $_->{strg} } @_) %> ];
@@ -48,6 +58,9 @@ __DATA__
   <script src="gallerizr.js"></script>
 </head>
 
-<body id="gallery"></body>
+<body>
+  <div id="gallery"></div>
+  <div id="browser"></div>
+</body>
 
 </html>
