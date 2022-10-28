@@ -1,4 +1,4 @@
-//--- simple debouncer
+// simple debouncer
 function debounce(func, timeout = 300) {
   let timer;
   return (...args) => {
@@ -13,14 +13,14 @@ function get_band(bands, width, pos) {
   return Math.floor(pos / (width / bands));
 }
 
-//--- image browser
+// image browser
 function browser(n)
 {
   return new Promise(async resolve => {
     const g = document.getElementById('gallery');
     const b = document.getElementById('browser');
 
-    // create image
+    // create initial image
     const image = document.createElement('img');
     image.setAttribute('src', images[n].name);
     b.append(image);
@@ -30,35 +30,30 @@ function browser(n)
     document.getElementsByTagName('html').item(0).style.overflowY = 'hidden';
     b.style.display = 'block';
 
-    // click navigation
-    let navigate = function(evt, resolve) {
+    // handle navigation
+    image.addEventListener('click', function(evt) {
       const whereTo = get_band(3, b.clientWidth, evt.clientX);
       let new_n;
       if(whereTo == 1) {
-        b.removeEventListener('click', navigate);
+        // revert to gallery view
+        b.style.display = 'none';
+        b.getElementsByTagName('img').item(0).remove();
+        document.getElementsByTagName('html').item(0).style.overflowY = 'scroll';
+        g.style.display = 'block';
         resolve();
         return;
       }
       else if(whereTo == 0) new_n = (n == 0 ? 0 : n-1)
-      else if(whereTo == 2) new_n = (n-1 < images.length ? n+1 : n)
+      else if(whereTo == 2) new_n = (n+1 < images.length ? n+1 : n)
       if(n != new_n) {
         image.setAttribute('src', images[new_n].name);
         n = new_n;
       }
-    }
-    await new Promise(
-      resolve => b.addEventListener('click', (evt) => navigate(evt, resolve))
-    );
-
-    // revert to gallery view
-    b.style.display = 'none';
-    document.getElementsByTagName('html').item(0).style.overflowY = 'scroll';
-    g.style.display = 'block';
-    resolve();
+    });
   });
 }
 
-//--- gallery
+// gallery
 function gallery(images)
 {
   const justifiedLayout = require("justified-layout");
@@ -103,14 +98,17 @@ function gallery(images)
 
   // click handler (initiate image browsing)
   base.addEventListener('click', async evt => {
+    console.log('Starting browser for %d', parseInt(evt.target.getAttribute('data-n')));
     await browser(parseInt(evt.target.getAttribute('data-n')));
+    resize();
+    console.log('Browser finished');
   });
 
   // put images into DOM
   base.append(...boxes);
 }
 
-//--- main
+// main
 document.addEventListener("DOMContentLoaded", function() {
   gallery(images);
 });
