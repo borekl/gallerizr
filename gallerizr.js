@@ -30,24 +30,49 @@ function browser(n)
     document.getElementsByTagName('html').item(0).style.overflowY = 'hidden';
     b.style.display = 'block';
 
-    // handle navigation
-    image.addEventListener('click', function(evt) {
-      const whereTo = get_band(3, b.clientWidth, evt.clientX);
-      let new_n;
-      if(whereTo == 1) {
-        // revert to gallery view
-        b.style.display = 'none';
-        b.getElementsByTagName('img').item(0).remove();
-        document.getElementsByTagName('html').item(0).style.overflowY = 'scroll';
-        g.style.display = 'block';
-        resolve();
-        return;
+    // navigational actions
+    function navigate(verb) {
+      let new_n = n;
+      switch (verb) {
+        case 'prev': new_n = (n == 0 ? 0 : n-1); break;
+        case 'next': new_n = (n+1 < images.length ? n+1 : n); break;
+        case 'first': new_n = 0; break;
+        case 'last': new_n = images.length - 1; break;
+        case 'exit':
+          // revert to gallery view
+          b.style.display = 'none';
+          b.getElementsByTagName('img').item(0).remove();
+          document.getElementsByTagName('html').item(0).style.overflowY = 'scroll';
+          g.style.display = 'block';
+          resolve();
+          return;
       }
-      else if(whereTo == 0) new_n = (n == 0 ? 0 : n-1)
-      else if(whereTo == 2) new_n = (n+1 < images.length ? n+1 : n)
       if(n != new_n) {
         image.setAttribute('src', images[new_n].name);
         n = new_n;
+      }
+    }
+
+    // handle mouse navigation
+    image.addEventListener('click', function(evt) {
+      const whereTo = get_band(3, b.clientWidth, evt.clientX);
+      switch (whereTo) {
+        case 0: navigate('prev'); break;
+        case 1: navigate('exit'); break;
+        case 2: navigate('next'); break;
+      }
+    });
+
+    // handle keyboard navigation
+    document.addEventListener('keydown', function(evt) {
+      switch (evt.code) {
+        case 'ArrowLeft': navigate('prev'); break;
+        case 'ArrowRight': navigate('next'); break;
+        case 'ArrowUp': navigate('prev'); break;
+        case 'ArrowDown': navigate('next'); break;
+        case 'Home': navigate('first'); break;
+        case 'End': navigate('last'); break;
+        case 'Escape': navigate('exit'); break;
       }
     });
   });
@@ -98,10 +123,8 @@ function gallery(images)
 
   // click handler (initiate image browsing)
   base.addEventListener('click', async evt => {
-    console.log('Starting browser for %d', parseInt(evt.target.getAttribute('data-n')));
     await browser(parseInt(evt.target.getAttribute('data-n')));
     resize();
-    console.log('Browser finished');
   });
 
   // put images into DOM
