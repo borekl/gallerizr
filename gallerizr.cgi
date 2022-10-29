@@ -4,11 +4,21 @@ use v5.26;
 use strict;
 use warnings;
 
-use Path::Tiny qw(cwd);
+use Path::Tiny qw(path cwd);
 use Image::Size;
 use Mojo::Template;
 use Mojo::Loader qw(data_section);
 
+# the directory to index; this is assembled from DOCUMENT_ROOT and REQUEST_URI
+# CGI environment variables; if these are missing or empty, current directory
+# is indexed instead (only useful for development)
+my $dir;
+if($ENV{DOCUMENT_ROOT} && $ENV{REQUEST_URI}) {
+  $dir = path($ENV{DOCUMENT_ROOT})->child($ENV{REQUEST_URI});
+}
+$dir = cwd unless $dir && $dir->is_dir;
+
+# make a list of images with their sizes
 my @images = map {
   my ($w, $h) = imgsize($_->stringify);
   {
@@ -19,8 +29,9 @@ my @images = map {
       $w, $h, $_->basename
     )
   }
-} cwd->children(qr/\.jpg$/);
+} sort { lc($a) cmp lc($b) } $dir->children(qr/\.jpg$/);
 
+# output a HTML page
 print "Content-type: text/html; charset: utf-8\n\n";
 
 my $mt = Mojo::Template->new;
@@ -36,7 +47,7 @@ __DATA__
 <html>
 
 <head>
-  <title>Gallerizr dev</title>
+  <title>Gallery</title>
   <style>
     html { overflow-y: scroll; }
     body { position: relative; margin: 0; background-color: #151515 }
