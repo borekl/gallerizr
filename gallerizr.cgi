@@ -48,20 +48,10 @@ __DATA__
 
 <head>
   <title>Gallery</title>
-  <style>
-    html { overflow-y: scroll; }
-    body { position: relative; margin: 0; background-color: #151515 }
-    #browser {
-      display: none;
-      margin: 0;
-      height: 100vh;
-    }
-    #browser img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-  </style>
+  <% if($ENV{GALLERIZR_URI_BASE}) { =%>
+  <base href="<%= $ENV{GALLERIZR_URI_BASE} =%>">
+  <% } =%>
+  <link rel="stylesheet" type="text/css" href="gallerizr.css">
   <script>
     const images = [ <%= join(",\n", map { $_->{strg} } @_) %> ];
   </script>
