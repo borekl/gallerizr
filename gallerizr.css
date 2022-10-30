@@ -1,4 +1,6 @@
-html {
+@import url('https://fonts.googleapis.com/css2?family=Paytone+One&display=swap');
+
+html.gallery {
   overflow-y: scroll;
 }
 
@@ -18,4 +20,25 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+div.notfound {
+  color: #333;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-family: "Paytone One";
+}
+
+div.notfound h1 {
+  font-size: 400%;
+  letter-spacing: 0.5rem;
+  margin: 0;
+}
+
+div.notfound p {
+  font-size: 200%;
+  margin: 0;
 }

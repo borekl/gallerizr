@@ -34,8 +34,9 @@ my @images = map {
 # output a HTML page
 print "Content-type: text/html; charset: utf-8\n\n";
 
+my $template = @images ? 'output.html.ep' : 'notfound.html.ep';
 my $mt = Mojo::Template->new;
-$mt->parse(data_section('main', 'output.html.ep'));
+$mt->parse(data_section('main', $template));
 say $mt->process(@images);
 
 __DATA__
@@ -44,24 +45,39 @@ __DATA__
 
 <!doctype html>
 
-<html>
+<html class="gallery">
 
 <head>
   <title>Gallery</title>
-  <% if($ENV{GALLERIZR_URI_BASE}) { =%>
-  <base href="<%= $ENV{GALLERIZR_URI_BASE} =%>">
-  <% } =%>
-  <link rel="stylesheet" type="text/css" href="gallerizr.css">
+  <link rel="stylesheet" type="text/css" href="<%= $ENV{GALLERIZR_URI_BASE} =%>gallerizr.css">
   <script>
     const images = [ <%= join(",\n", map { $_->{strg} } @_) %> ];
   </script>
   <script src="https://unpkg.com/justified-layout@4.1.0/dist/justified-layout.min.js"></script>
-  <script src="gallerizr.js"></script>
+  <script src="<%= $ENV{GALLERIZR_URI_BASE} =%>gallerizr.js"></script>
 </head>
 
 <body>
   <div id="gallery"></div>
   <div id="browser"></div>
+</body>
+
+</html>
+
+@@notfound.html.ep
+
+<!doctype html>
+
+<head>
+  <title>Gallery</title>
+  <link rel="stylesheet" type="text/css" href="<%= $ENV{GALLERIZR_URI_BASE} =%>gallerizr.css">
+</head>
+
+<body>
+  <div class="notfound">
+    <h1>NO IMAGES FOUND</h1>
+    <p>Sorry, there are no pictures in this directory</p>
+  </div>
 </body>
 
 </html>
