@@ -1,15 +1,20 @@
 ![Screenshot](https://i.imgur.com/toLsk59.jpg)
 
 # gallerizr
-Dynamically create a browseable gallery out of a directory of images.
+Dynamically create a browseable gallery out of a directory of images and videos.
 
 Gallerizr is a script that turns a directory of images into a simple web gallery (example shown).
 It tiles the images useing Flickr's [justified-content](http://flickr.github.io/justified-layout/)
-module and it also allows browsing individual images. The gallery generation is fully dynamic:
-Just create a directory, copy images into it and you're ready to serve a gallery.
+module and it also allows browsing individual images with both mouse and keyboard navigation.
+The gallery generation is fully dynamic: Just create a directory, copy images into it and
+you're ready to serve a gallery.
 
 The script is intended to run as a custom directory indexer (e. g. `DirectoryIndex`
 directive in Apache).
+
+**Note on video support**: At this moment the support for videos is rather limited:
+videos always appear at the end of the gallery after any images and they are limited
+to aspect ratio of 16:9.
 
 ## Installation and configuration
 Gallerizr is CGI script written in perl with some client-side JavaScript to use the layout
@@ -58,7 +63,7 @@ implement eventually:
 
 * configurability through config files
 * configurability of individual galleries
-* integration of videos
+* better support for videos
 * directory navigation of some sorts
 * linking of galleries (to allow to have collections of galleries)
 
