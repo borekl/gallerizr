@@ -37,7 +37,7 @@ to be loaded). Example with `/opt/galerizr` directory holding the files publishe
 `/gallerizr` on the web side:
 
     Alias /gallerizr /opt/gallerizr
-    <Directory /home/borek/dev/gallerizr>
+    <Directory /opt/gallerizr>
       Options ExecCGI
       AddHandler cgi-script .cgi
       Require all granted
