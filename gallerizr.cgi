@@ -25,11 +25,19 @@ my @images = map {
     path => $_,
     width => $w, height => $h,
     strg => sprintf(
-      '{width:%d,height:%d,name:"%s"}',
+      '{width:%d,height:%d,name:"%s",type:"image"}',
       $w, $h, $_->basename
     )
   }
 } sort { lc($a) cmp lc($b) } $dir->children(qr/\.jpg$/);
+
+# make a list of videos (at this moment only fixed 16:9 aspect)
+my @videos = map {{
+  width => 1920, height => 1080, path => $_,
+  strg => sprintf(
+    '{width:%d,height:%d,name:"%s",type:"video"}', 1920, 1080, $_->basename
+  )
+}} sort { lc($a) cmp lc($b) } $dir->children(qr/\.mp4$/);
 
 # output a HTML page
 print "Content-type: text/html; charset: utf-8\n\n";
@@ -37,7 +45,7 @@ print "Content-type: text/html; charset: utf-8\n\n";
 my $template = @images ? 'output.html.ep' : 'notfound.html.ep';
 my $mt = Mojo::Template->new;
 $mt->parse(data_section('main', $template));
-say $mt->process(@images);
+say $mt->process(@images, @videos);
 
 __DATA__
 
