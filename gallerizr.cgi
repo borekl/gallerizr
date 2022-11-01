@@ -57,12 +57,12 @@ __DATA__
 
 <head>
   <title>Gallery</title>
-  <link rel="stylesheet" type="text/css" href="<%= $ENV{GALLERIZR_URI_BASE} =%>gallerizr.css">
+  <link rel="stylesheet" type="text/css" href="<%= $ENV{GALLERIZR_URI_BASE} // '' =%>gallerizr.css">
   <script>
     const images = [ <%= join(",\n", map { $_->{strg} } @_) %> ];
   </script>
   <script src="https://unpkg.com/justified-layout@4.1.0/dist/justified-layout.min.js"></script>
-  <script src="<%= $ENV{GALLERIZR_URI_BASE} =%>gallerizr.js"></script>
+  <script src="<%= $ENV{GALLERIZR_URI_BASE} // '' =%>gallerizr.js"></script>
 </head>
 
 <body>
@@ -78,7 +78,7 @@ __DATA__
 
 <head>
   <title>Gallery</title>
-  <link rel="stylesheet" type="text/css" href="<%= $ENV{GALLERIZR_URI_BASE} =%>gallerizr.css">
+  <link rel="stylesheet" type="text/css" href="<%= $ENV{GALLERIZR_URI_BASE} // '' =%>gallerizr.css">
 </head>
 
 <body>
