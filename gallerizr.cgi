@@ -8,6 +8,7 @@ use Path::Tiny qw(path cwd);
 use Image::Size;
 use Mojo::Template;
 use Mojo::Loader qw(data_section);
+use Mojo::JSON qw(decode_json encode_json);
 
 # Mojo::Template stash
 my %stash = ( items => [] );
@@ -20,6 +21,17 @@ if($ENV{DOCUMENT_ROOT} && $ENV{REQUEST_URI}) {
   $dir = path($ENV{DOCUMENT_ROOT})->child($ENV{REQUEST_URI});
 }
 $dir = cwd unless $dir && $dir->is_dir;
+
+# attempt to read global configuration
+my $gcfg;
+my $gcfg_file = cwd->child('gallerizr.json');
+if($gcfg_file->is_file) {
+  $gcfg = decode_json($gcfg_file->slurp_raw);
+}
+
+# pass along the fronted part of the config
+$stash{client_config} = encode_json($gcfg->{client})
+if $gcfg && exists $gcfg->{client};
 
 # make a list of images with their sizes
 push($stash{items}->@*, map {
@@ -63,6 +75,9 @@ __DATA__
   <link rel="stylesheet" type="text/css" href="<%= $ENV{GALLERIZR_URI_BASE} // '' =%>gallerizr.css">
   <script>
     const images = [ <%= join(",\n", map { $_->{strg} } $_[0]->{items}->@* ) %> ];
+    <% if(exists $_[0]->{client_config}) { =%>
+    const config = <%= $_[0]->{client_config} %>;
+    <% } =%>
   </script>
   <script src="https://unpkg.com/justified-layout@4.1.0/dist/justified-layout.min.js"></script>
   <script src="<%= $ENV{GALLERIZR_URI_BASE} // '' =%>gallerizr.js"></script>
