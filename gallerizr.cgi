@@ -9,6 +9,9 @@ use Image::Size;
 use Mojo::Template;
 use Mojo::Loader qw(data_section);
 
+# Mojo::Template stash
+my %stash = ( items => [] );
+
 # the directory to index; this is assembled from DOCUMENT_ROOT and REQUEST_URI
 # CGI environment variables; if these are missing or empty, current directory
 # is indexed instead (only useful for development)
@@ -19,7 +22,7 @@ if($ENV{DOCUMENT_ROOT} && $ENV{REQUEST_URI}) {
 $dir = cwd unless $dir && $dir->is_dir;
 
 # make a list of images with their sizes
-my @images = map {
+push($stash{items}->@*, map {
   my ($w, $h) = imgsize($_->stringify);
   {
     path => $_,
@@ -29,23 +32,23 @@ my @images = map {
       $w, $h, $_->basename
     )
   }
-} sort { lc($a) cmp lc($b) } $dir->children(qr/\.jpg$/);
+} sort { lc($a) cmp lc($b) } $dir->children(qr/\.jpg$/));
 
 # make a list of videos (at this moment only fixed 16:9 aspect)
-my @videos = map {{
+push($stash{items}->@*, map {{
   width => 1920, height => 1080, path => $_,
   strg => sprintf(
     '{width:%d,height:%d,name:"%s",type:"video"}', 1920, 1080, $_->basename
   )
-}} sort { lc($a) cmp lc($b) } $dir->children(qr/\.mp4$/);
+}} sort { lc($a) cmp lc($b) } $dir->children(qr/\.mp4$/));
 
 # output a HTML page
 print "Content-type: text/html; charset: utf-8\n\n";
 
-my $template = @images || @videos ? 'output.html.ep' : 'notfound.html.ep';
+my $template = $stash{items}->@* ? 'output.html.ep' : 'notfound.html.ep';
 my $mt = Mojo::Template->new;
 $mt->parse(data_section('main', $template));
-say $mt->process(@images, @videos);
+say $mt->process(\%stash);
 
 __DATA__
 
@@ -59,7 +62,7 @@ __DATA__
   <title>Gallery</title>
   <link rel="stylesheet" type="text/css" href="<%= $ENV{GALLERIZR_URI_BASE} // '' =%>gallerizr.css">
   <script>
-    const images = [ <%= join(",\n", map { $_->{strg} } @_) %> ];
+    const images = [ <%= join(",\n", map { $_->{strg} } $_[0]->{items}->@* ) %> ];
   </script>
   <script src="https://unpkg.com/justified-layout@4.1.0/dist/justified-layout.min.js"></script>
   <script src="<%= $ENV{GALLERIZR_URI_BASE} // '' =%>gallerizr.js"></script>
