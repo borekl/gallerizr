@@ -81,7 +81,7 @@ __DATA__
 
 <head>
   <title>Gallery</title>
-  <link rel="stylesheet" type="text/css" href="<%= $ENV{GALLERIZR_URI_BASE} // '' =%>gallerizr.css">
+  <link rel="stylesheet" type="text/css" href="<%= $ENV{GALLERIZR_URI_BASE} // '' %>gallerizr.css">
 </head>
 
 <body>
