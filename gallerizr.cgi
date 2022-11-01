@@ -42,7 +42,7 @@ my @videos = map {{
 # output a HTML page
 print "Content-type: text/html; charset: utf-8\n\n";
 
-my $template = @images ? 'output.html.ep' : 'notfound.html.ep';
+my $template = @images || @videos ? 'output.html.ep' : 'notfound.html.ep';
 my $mt = Mojo::Template->new;
 $mt->parse(data_section('main', $template));
 say $mt->process(@images, @videos);
