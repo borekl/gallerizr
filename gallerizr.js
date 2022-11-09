@@ -120,6 +120,7 @@ function gallery(images)
   let viewportWidth = base.clientWidth;
   const boxes = [];
   let layout;
+  let jlconfig = typeof config !== 'undefined' ? config.jlconfig : {};
 
   // create elements for individual gallery images/videos
   for(const i of images.keys()) {
@@ -138,11 +139,8 @@ function gallery(images)
 
   // compute layout using justified-layout module (must be loaded externally)
   function computeLayout() {
-    layout = justifiedLayout(images, {
-      containerWidth: viewportWidth,
-      boxSpacing: 5,
-      containerPadding: 10
-    });
+    jlconfig.containerWidth = viewportWidth;
+    layout = justifiedLayout(images, jlconfig);
     for(const i of images.keys()) {
       boxes[i].setAttribute('width', layout.boxes[i].width);
       boxes[i].setAttribute('height', layout.boxes[i].height);

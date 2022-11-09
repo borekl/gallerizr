@@ -1,0 +1,9 @@
+{
+  "server": {},
+  "client": {
+    "jlconfig": {
+      "boxSpacing": 5,
+      "containerPadding": 10
+    }
+  }
+}

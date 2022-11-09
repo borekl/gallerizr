@@ -23,10 +23,10 @@ if($ENV{DOCUMENT_ROOT} && $ENV{REQUEST_URI}) {
 $dir = cwd unless $dir && $dir->is_dir;
 
 # attempt to read global configuration
-my $gcfg;
-my $gcfg_file = cwd->child('gallerizr.json');
-if($gcfg_file->is_file) {
-  $gcfg = decode_json($gcfg_file->slurp_raw);
+my ($gcfg, $gcfg_file);
+if($ENV{GALLERIZR_CONFIG} && $ENV{GALLERIZR_CONFIG} eq 'load') {
+  $gcfg_file = cwd->child('gallerizr.json');
+  $gcfg = decode_json($gcfg_file->slurp_raw) if $gcfg_file->is_file;
 }
 
 # pass along the fronted part of the config
