@@ -163,7 +163,9 @@ function gallery(images)
 
   // click handler (initiate image browsing)
   base.addEventListener('click', async evt => {
-    await browser(parseInt(evt.target.getAttribute('data-n')));
+    const n = evt.target.getAttribute('data-n');
+    if(n == null) return;
+    await browser(parseInt(n));
     resize();
   });
 
