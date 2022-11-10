@@ -24,7 +24,7 @@ body {
 
 div.notfound {
   color: #333;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -41,4 +41,20 @@ div.notfound h1 {
 div.notfound p {
   font-size: 200%;
   margin: 0;
+}
+
+div.notfound p.dirs {
+  margin-top: 1em;
+}
+
+a.dirs {
+  text-decoration: none;
+}
+
+a.dirs:visited {
+  color: inherit;
+}
+
+a.dirs:hover {
+  color: #555;
 }

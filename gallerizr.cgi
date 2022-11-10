@@ -55,6 +55,19 @@ push($stash{items}->@*, map {{
   )
 }} sort { lc($a) cmp lc($b) } $dir->children(qr/\.mp4$/));
 
+# if no displayable items are found and the option is enabled in configuration,
+# scan for directories, which will be then shown to the client for navigation
+if(!$stash{items}->@* && $gcfg && $gcfg->{server}{showDirs}) {
+  my @dirs = grep {
+    $_ !~ /^\./
+  } map {
+    $_->basename
+  } grep {
+    $_->is_dir
+  } $dir->children;
+  $stash{dirs} = \@dirs if @dirs;
+}
+
 # output a HTML page
 print "Content-type: text/html; charset: utf-8\n\n";
 
@@ -104,6 +117,13 @@ __DATA__
   <div class="notfound">
     <h1>NO IMAGES FOUND</h1>
     <p>Sorry, there are no pictures in this directory</p>
+    <% if(exists $_[0]->{dirs} && $_[0]->{dirs}->@*) { =%>
+    <p class="dirs">
+    <% foreach ($_[0]->{dirs}->@*) { =%>
+      <a class="dirs" href="<%= "$_/" %>"><%= $_ %></a><br>
+    <% } =%>
+    </p>
+    <% } =%>
   </div>
 </body>
 

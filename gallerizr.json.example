@@ -1,5 +1,7 @@
 {
-  "server": {},
+  "server": {
+    "showDirs": false
+  },
   "client": {
     "jlconfig": {
       "boxSpacing": 5,
