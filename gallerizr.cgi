@@ -24,8 +24,9 @@ $dir = cwd unless $dir && $dir->is_dir;
 
 # attempt to read global configuration
 my ($gcfg, $gcfg_file);
-if($ENV{GALLERIZR_CONFIG} && $ENV{GALLERIZR_CONFIG} eq 'load') {
+if($ENV{GALLERIZR_CONFIG}) {
   $gcfg_file = cwd->child('gallerizr.json');
+  $gcfg_file = path($ENV{GALLERIZR_CONFIG}) unless $ENV{GALLERIZR_CONFIG} eq 'load';
   $gcfg = decode_json($gcfg_file->slurp_raw) if $gcfg_file->is_file;
 }
 
