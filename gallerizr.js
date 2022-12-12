@@ -7,8 +7,8 @@ function debounce(func, timeout = 300) {
   };
 }
 
-// for given 'width' and 'pos' return in what band out of 'bands' the
-// position is
+// for given 'width' and 'pos' return in what band out of 'bands' the position
+// is
 function get_band(bands, width, pos) {
   return Math.floor(pos / (width / bands));
 }
@@ -43,9 +43,9 @@ function browser(n)
     switch_view();
 
     // browser view switching; this is the core image browser function that
-    // handles opening a new image/video, switching between images/videos
-    // and finally shuts down the browser when requested; the argument specifis
-    // the numerical index of the image/video the browser shall initialize with
+    // handles opening a new image/video, switching between images/videos and
+    // finally shuts down the browser when requested; the argument specifies the
+    // numerical index of the image/video the browser shall initialize with
     function switch_view(to)
     {
       // open view
