@@ -45,7 +45,7 @@ push($stash{items}->@*, map {
       $w, $h, $_->basename
     )
   }
-} sort { lc($a) cmp lc($b) } $dir->children(qr/\.jpg$/));
+} sort { lc($a) cmp lc($b) } $dir->children(qr/\.jpg$/i));
 
 # make a list of videos (at this moment only fixed 16:9 aspect)
 push($stash{items}->@*, map {{
@@ -53,7 +53,7 @@ push($stash{items}->@*, map {{
   strg => sprintf(
     '{width:%d,height:%d,name:"%s",type:"video"}', 1920, 1080, $_->basename
   )
-}} sort { lc($a) cmp lc($b) } $dir->children(qr/\.mp4$/));
+}} sort { lc($a) cmp lc($b) } $dir->children(qr/\.mp4$/i));
 
 # if no displayable items are found and the option is enabled in configuration,
 # scan for directories, which will be then shown to the client for navigation
