@@ -13,12 +13,13 @@ function get_band(bands, width, pos) {
   return Math.floor(pos / (width / bands));
 }
 
-// create a SPAN element with class and content
+// create a SPAN element with class and content, optionally append to a parent
+// and set that parent to "display: block"
 function make_span(cssClass, text, where) {
   let el = document.createElement('span');
   if(cssClass) el.className = cssClass;
   if(text) el.textContent = text;
-  if(where) where.append(el);
+  if(where) { where.append(el); where.style.display = 'block'; }
   return el;
 }
 
@@ -142,13 +143,11 @@ function gallery(images)
   // title
   if(dirinfo && 'title' in dirinfo) {
     make_span('title', dirinfo.title, title);
-    title.style.display = 'block';
   }
 
   // date
   if(dirinfo && 'date' in dirinfo) {
     make_span('date', dirinfo.date, title);
-    title.style.display = 'block';
   }
 
   // create elements for individual gallery images/videos
