@@ -8,10 +8,15 @@ use Path::Tiny qw(path cwd);
 use Image::Size;
 use Mojo::Template;
 use Mojo::Loader qw(data_section);
-use Mojo::JSON qw(decode_json encode_json);
+use Mojo::JSON qw(decode_json to_json);
+
+binmode(STDOUT, ':utf8');
 
 # Mojo::Template stash
-my %stash = ( items => [] );
+my %stash = (
+  items => [],
+  gallery_title => 'Gallery',
+);
 
 # the directory to index; this is assembled from DOCUMENT_ROOT and REQUEST_URI
 # CGI environment variables; if these are missing or empty, current directory
@@ -30,9 +35,15 @@ if($ENV{GALLERIZR_CONFIG}) {
   $gcfg = decode_json($gcfg_file->slurp_raw) if $gcfg_file->is_file;
 }
 
-# pass along the fronted part of the config
-$stash{client_config} = encode_json($gcfg->{client})
+# store the fronted part of the config in template stash
+$stash{client_config} = to_json($gcfg->{client})
 if $gcfg && exists $gcfg->{client};
+
+# load directory-specific data/config, if it exists
+my $lcfg_file = $dir->child('info.json');
+my $lcfg = decode_json($lcfg_file->slurp_raw) if $lcfg_file->is_file;
+$stash{dirinfo} = to_json($lcfg);
+$stash{gallery_title} = $lcfg->{title} if exists $lcfg->{title};
 
 # make a list of images with their sizes
 push($stash{items}->@*, map {
@@ -85,12 +96,13 @@ __DATA__
 <html class="gallery">
 
 <head>
-  <title>Gallery</title>
+  <title><%= $_[0]->{gallery_title} %></title>
   <link rel="stylesheet" type="text/css" href="<%= $ENV{GALLERIZR_URI_BASE} // '' =%>gallerizr.css">
   <script>
     const images = [ <%= join(",\n", map { $_->{strg} } $_[0]->{items}->@* ) %> ];
     <% if(exists $_[0]->{client_config}) { =%>
     const config = <%= $_[0]->{client_config} %>;
+    const dirinfo = <%= $_[0]->{dirinfo} %>;
     <% } =%>
   </script>
   <script src="https://unpkg.com/justified-layout@4.1.0/dist/justified-layout.min.js"></script>
@@ -98,6 +110,7 @@ __DATA__
 </head>
 
 <body>
+  <div id="title"></div>
   <div id="gallery"></div>
   <div id="browser"></div>
 </body>

@@ -13,10 +13,24 @@ function get_band(bands, width, pos) {
   return Math.floor(pos / (width / bands));
 }
 
+// create a SPAN element with class and content
+function make_span(cssClass, text, where) {
+  let el = document.createElement('span');
+  if(cssClass) el.className = cssClass;
+  if(text) el.textContent = text;
+  if(where) where.append(el);
+  return el;
+}
+
 // image browser; this implements the single-image browsing mode; the function
 // returns a promise that resolves when user exits the browser
 function browser(n)
 {
+  // save state of the title bar and hide it
+  let title = document.getElementById('title');
+  let titleState = title.style.display;
+  title.style.display = 'none';
+
   return new Promise(async resolve => {
     const g = document.getElementById('gallery');
     const b = document.getElementById('browser');
@@ -54,6 +68,7 @@ function browser(n)
         document.getElementsByTagName('html').item(0).style.overflowY = 'scroll';
         g.style.display = 'block';
         view = null;
+        title.style.display = titleState; // restore title bar
         resolve();
         return
       }
@@ -117,10 +132,24 @@ function gallery(images)
 {
   const justifiedLayout = require("justified-layout");
   const base = document.getElementById('gallery');
+  const body = document.getElementsByTagName('body')[0];
+  let title = document.getElementById('title');
   let viewportWidth = base.clientWidth;
   const boxes = [];
   let layout;
   let jlconfig = typeof config !== 'undefined' ? config.jlconfig : {};
+
+  // title
+  if(dirinfo && 'title' in dirinfo) {
+    make_span('title', dirinfo.title, title);
+    title.style.display = 'block';
+  }
+
+  // date
+  if(dirinfo && 'date' in dirinfo) {
+    make_span('date', dirinfo.date, title);
+    title.style.display = 'block';
+  }
 
   // create elements for individual gallery images/videos
   for(const i of images.keys()) {
@@ -141,10 +170,12 @@ function gallery(images)
   function computeLayout() {
     jlconfig.containerWidth = viewportWidth;
     layout = justifiedLayout(images, jlconfig);
+    let skip_title = 0;
+    if(title) skip_title = title.clientHeight;
     for(const i of images.keys()) {
       boxes[i].setAttribute('width', layout.boxes[i].width);
       boxes[i].setAttribute('height', layout.boxes[i].height);
-      boxes[i].style.top = layout.boxes[i].top + 'px';
+      boxes[i].style.top = layout.boxes[i].top + skip_title + 'px';
       boxes[i].style.left =  layout.boxes[i].left + 'px';
     }
     base.style.height = layout.containerHeight + 'px';

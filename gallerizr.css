@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Paytone+One&display=swap');
+@import url(https://fonts.googleapis.com/css2?family=Paytone+One&display=swap);
+@import url(https://fonts.googleapis.com/css?family=Work+Sans:800,600,400&subset=latin,latin-ext);
 
 html.gallery {
   overflow-y: scroll;
@@ -57,4 +58,22 @@ a.dirs:visited {
 
 a.dirs:hover {
   color: #555;
+}
+
+div#title {
+  display: none;
+  color: white;
+  padding-top: 0.5rem;
+  padding-left: 10px;
+  font-family : work sans, sans-serif;
+  font-size: 120%;
+}
+
+div#title span.title {
+  color: #ccc;
+  margin-right: 1rem;
+}
+
+div#title span.date {
+  color: #777;
 }
