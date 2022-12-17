@@ -23,14 +23,60 @@ function make_span(cssClass, text, where) {
   return el;
 }
 
+// header handling
+function header_ctl() {
+  const el = document.getElementsByTagName('header')[0];
+
+  // initialize navigation elements according to configuration
+  const nav = document.getElementsByTagName('nav')[0];
+  let [prev, exit, next] = nav.children;
+  if(!(typeof dirinfo !== 'defined' && 'prev' in dirinfo && dirinfo.prev)) {
+    prev.remove(); prev = null;
+  }
+  if(!(typeof dirinfo !== 'defined' && 'next' in dirinfo && dirinfo.next)) {
+    next.remove(); next = null;
+  }
+  if(!(typeof dirinfo !== 'defined' && 'exit' in dirinfo && dirinfo.exit)) {
+    exit.remove(); exit = null;
+  }
+  if(nav.childElementCount) {
+    nav.style.display = 'block';
+    el.style.display = 'flex';
+  }
+
+  return {
+    el: el,
+    visibility: [],
+    show() { this.el.style.display = 'flex' },
+    hide() { this.el.style.display = 'none' },
+    visible() { return this.el.style.display == 'flex' },
+    saveAndHide() {
+      this.visibility.push(this.visible());
+      this.hide();
+    },
+    restore() { if(this.visibility.pop()) this.show() },
+    title(txt) {
+      make_span('title', txt, this.el.firstElementChild); this.show();
+    },
+    date(txt) {
+      make_span('date', txt, this.el.firstElementChild); this.show();
+    },
+    bind(handler) {
+      if(prev) { prev.addEventListener('click', (e) => handler(e)) }
+      if(next) { next.addEventListener('click', (e) => handler(e)) }
+      if(exit) { exit.addEventListener('click', (e) => handler(e)) }
+    }
+  }
+}
+
+/*============================================================================*/
+
 // image browser; this implements the single-image browsing mode; the function
 // returns a promise that resolves when user exits the browser
 function browser(n)
 {
   // save state of the title bar and hide it
-  let title = document.getElementById('title');
-  let titleState = title.style.display;
-  title.style.display = 'none';
+  header.saveAndHide();
 
   return new Promise(async resolve => {
     const g = document.getElementById('gallery');
@@ -69,7 +115,7 @@ function browser(n)
         document.getElementsByTagName('html').item(0).style.overflowY = 'scroll';
         g.style.display = 'block';
         view = null;
-        title.style.display = titleState; // restore title bar
+        header.restore();
         resolve();
         return
       }
@@ -116,38 +162,78 @@ function browser(n)
     // handle keyboard navigation
     function handle_keypress(evt) {
       switch (evt.code) {
-        case 'ArrowLeft': navigate('prev'); break;
-        case 'ArrowRight': navigate('next'); break;
-        case 'ArrowUp': navigate('prev'); break;
-        case 'ArrowDown': navigate('next'); break;
-        case 'Home': navigate('first'); break;
-        case 'End': navigate('last'); break;
-        case 'Escape': navigate('exit'); break;
+        case 'ArrowLeft': { evt.preventDefault(); navigate('prev') }; break;
+        case 'ArrowRight': { evt.preventDefault(); navigate('next') }; break;
+        case 'ArrowUp': { evt.preventDefault(); navigate('prev') }; break;
+        case 'ArrowDown': { evt.preventDefault(); navigate('next') }; break;
+        case 'Home': { evt.preventDefault(); navigate('first') }; break;
+        case 'End': { evt.preventDefault(); navigate('last') }; break;
+        case 'Escape': { evt.preventDefault(); navigate('exit') }; break;
       }
     }
   });
 }
+
+/*============================================================================*/
 
 // gallery; implements the layout and image browser invocation
 function gallery(images)
 {
   const justifiedLayout = require("justified-layout");
   const base = document.getElementById('gallery');
-  const body = document.getElementsByTagName('body')[0];
-  let title = document.getElementById('title');
   let viewportWidth = base.clientWidth;
   const boxes = [];
   let layout;
   let jlconfig = typeof config !== 'undefined' ? config.jlconfig : {};
+  let inhibitKeys = false;
 
-  // title
-  if(dirinfo && 'title' in dirinfo) {
-    make_span('title', dirinfo.title, title);
+  // navigation actions
+  function navigate(action) {
+    switch (action) {
+      case 'next': {
+        if(dirinfo && dirinfo.next) {
+          window.location.assign('../' + dirinfo.next);
+        }
+      }; break;
+      case 'prev': {
+        if(dirinfo && dirinfo.prev) {
+          window.location.assign('../' + dirinfo.prev);
+        }
+      }; break;
+      case 'exit': {
+        if(dirinfo && dirinfo.exit) {
+          window.location.assign('../');
+        }
+      }; break;
+    }
   }
 
-  // date
-  if(dirinfo && 'date' in dirinfo) {
-    make_span('date', dirinfo.date, title);
+  // handle clicks
+  header.bind(e => {
+    e.preventDefault();
+    switch (e.currentTarget.getAttribute('id')) {
+      case 'nav-prev': navigate('prev'); break;
+      case 'nav-next': navigate('next'); break;
+      case 'nav-exit': navigate('exit'); break;
+    }
+  });
+
+  // handle keyboard control, when in browsing mode, we just do nothing
+  document.addEventListener('keydown', evt => {
+    if(inhibitKeys) return;
+    switch (evt.code) {
+      case 'ArrowRight': { evt.preventDefault(); navigate('next') }; break;
+      case 'ArrowLeft': { evt.preventDefault(); navigate('prev') }; break;
+      case 'Escape': { evt.preventDefault(); navigate('exit') }; break;
+    }
+  });
+
+  // title and date
+  if(typeof dirinfo !== 'defined' && dirinfo && 'title' in dirinfo) {
+    header.title(dirinfo.title)
+  }
+  if(typeof dirinfo !== 'defined' && dirinfo && 'date' in dirinfo) {
+    header.date(dirinfo.date)
   }
 
   // create elements for individual gallery images/videos
@@ -169,8 +255,7 @@ function gallery(images)
   function computeLayout() {
     jlconfig.containerWidth = viewportWidth;
     layout = justifiedLayout(images, jlconfig);
-    let skip_title = 0;
-    if(title) skip_title = title.clientHeight;
+    let skip_title = header.el.clientHeight;
     for(const i of images.keys()) {
       boxes[i].setAttribute('width', layout.boxes[i].width);
       boxes[i].setAttribute('height', layout.boxes[i].height);
@@ -193,15 +278,21 @@ function gallery(images)
   base.addEventListener('click', async evt => {
     const n = evt.target.getAttribute('data-n');
     if(n == null) return;
+    inhibitKeys = true;
     await browser(parseInt(n));
     resize();
+    inhibitKeys = false;
   });
 
   // put images into DOM
   base.append(...boxes);
 }
 
+/*============================================================================*/
+
 // main
+let header;
 document.addEventListener("DOMContentLoaded", function() {
+  header = header_ctl();
   gallery(images);
 });

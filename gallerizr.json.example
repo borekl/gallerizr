@@ -1,6 +1,7 @@
 {
   "server": {
-    "showDirs": false
+    "showDirs": false,
+    "imageFilter": "^(?!thumb).*\\.jpg\\z"
   },
   "client": {
     "jlconfig": {

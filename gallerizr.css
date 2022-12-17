@@ -8,7 +8,12 @@ html.gallery {
 body {
   position: relative;
   margin: 0;
-  background-color: #151515
+  background-color: #151515;
+  color: #aaa;
+}
+
+.hidden {
+  display: none !important;
 }
 
 #browser {
@@ -60,13 +65,23 @@ a.dirs:hover {
   color: #555;
 }
 
-div#title {
+/*--- header */
+
+header {
+  padding-left: 10px;
+  padding-right: 10px;
   display: none;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+/*--- header -> title/date */
+
+div#title {
   color: white;
   padding-top: 0.5rem;
-  padding-left: 10px;
   font-family : work sans, sans-serif;
-  font-size: 120%;
+  font-size: 150%;
 }
 
 div#title span.title {
@@ -76,4 +91,24 @@ div#title span.title {
 
 div#title span.date {
   color: #777;
+}
+
+/*--- navigation buttons */
+
+nav {
+  display: none;
+}
+
+.nav-button {
+  background-color: transparent;
+  border: none;
+  fill: #888;
+  padding: 4px 8px 1px 8px;
+  margin-top: 9px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.nav-button:hover {
+  fill: #eee;
 }
