@@ -27,21 +27,25 @@ function make_span(cssClass, text, where) {
 function header_ctl() {
   const el = document.getElementsByTagName('header')[0];
 
-  // initialize navigation elements according to configuration
+  // initialize navigation elements according to configuration; note, that the
+  // nav section might be completely missing
   const nav = document.getElementsByTagName('nav')[0];
-  let [prev, exit, next] = nav.children;
-  if(!(typeof dirinfo !== 'defined' && 'prev' in dirinfo && dirinfo.prev)) {
-    prev.remove(); prev = null;
-  }
-  if(!(typeof dirinfo !== 'defined' && 'next' in dirinfo && dirinfo.next)) {
-    next.remove(); next = null;
-  }
-  if(!(typeof dirinfo !== 'defined' && 'exit' in dirinfo && dirinfo.exit)) {
-    exit.remove(); exit = null;
-  }
-  if(nav.childElementCount) {
-    nav.style.display = 'block';
-    el.style.display = 'flex';
+  let prev, exit, next;
+  if(typeof nav !== 'undefined') {
+    [prev, exit, next] = nav.children;
+    if(!(typeof dirinfo !== 'defined' && 'prev' in dirinfo && dirinfo.prev)) {
+      prev.remove(); prev = null;
+    }
+    if(!(typeof dirinfo !== 'defined' && 'next' in dirinfo && dirinfo.next)) {
+      next.remove(); next = null;
+    }
+    if(!(typeof dirinfo !== 'defined' && 'exit' in dirinfo && dirinfo.exit)) {
+      exit.remove(); exit = null;
+    }
+    if(nav.childElementCount) {
+      nav.style.display = 'block';
+      el.style.display = 'flex';
+    }
   }
 
   return {
@@ -62,6 +66,7 @@ function header_ctl() {
       make_span('date', txt, this.el.firstElementChild); this.show();
     },
     bind(handler) {
+      if(typeof nav === 'undefined') return;
       if(prev) { prev.addEventListener('click', (e) => handler(e)) }
       if(next) { next.addEventListener('click', (e) => handler(e)) }
       if(exit) { exit.addEventListener('click', (e) => handler(e)) }

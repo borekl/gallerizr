@@ -44,6 +44,12 @@ my $lcfg = decode_json($lcfg_file->slurp_raw) if $lcfg_file->is_file;
 $stash{dirinfo} = to_json($lcfg);
 $stash{gallery_title} = $lcfg->{title} if exists $lcfg->{title};
 
+# determine if we should include navigation SVG icons
+$stash{need_nav_icons} = 0;
+if(ref $lcfg && ($lcfg->{prev} || $lcfg->{next} || $lcfg->{exit})) {
+  $stash{need_nav_icons} = 1;
+}
+
 # make a list of images with their sizes
 my $custom_filter = $gcfg->{server}{imageFilter} // undef;
 my $filter = $custom_filter ? qr/$custom_filter/i : qr/\.jpg$/i;
@@ -115,6 +121,7 @@ __DATA__
 
 <body>
 
+  <% if($_[0]->{need_nav_icons}) { =%>
   <svg xmlns="http://www.w3.org/2000/svg" class="hidden">
     <symbol viewBox="0 0 500 500" id="icon-close">
       <g>
@@ -166,9 +173,11 @@ __DATA__
         c7.046-7.423,10.571-16.084,10.571-25.981C362.597,212.321,359.071,203.755,352.025,196.712z"/>
     </symbol>
   </svg>
+  <% } =%>
 
   <header>
     <div id="title"></div>
+    <% if($_[0]->{need_nav_icons}) { =%>
     <nav>
       <button class="nav-button" id="nav-prev"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17">
         <use xlink:href="#icon-left" />
@@ -180,6 +189,7 @@ __DATA__
         <use xlink:href="#icon-right" />
       </svg></button>
     </nav>
+    <% } =%>
   </header>
 
   <div id="gallery"></div>
