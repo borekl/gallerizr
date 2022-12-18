@@ -25,7 +25,7 @@ they are limited to aspect ratio of 16:9.
 ## Installation and configuration
 Gallerizr is CGI script written in perl with some client-side JavaScript to use
 the layout library and handle interactivity. Following non-core perl libraries
-are required along with sufficiently recent version of perl (at least 5.26):
+are required along with sufficiently recent version of perl (at least 5.24):
 
 * Path::Tiny
 * Image::Size

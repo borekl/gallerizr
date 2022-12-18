@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 
-use v5.26;
 use strict;
 use warnings;
 
@@ -87,7 +86,7 @@ print "Content-type: text/html; charset: utf-8\n\n";
 my $template = $stash{items}->@* ? 'output.html.ep' : 'notfound.html.ep';
 my $mt = Mojo::Template->new;
 $mt->parse(data_section('main', $template));
-say $mt->process(\%stash);
+print $mt->process(\%stash), "\n";
 
 __DATA__
 
