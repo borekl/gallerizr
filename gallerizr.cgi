@@ -55,12 +55,14 @@ my $custom_filter = $gcfg->{server}{imageFilter} // undef;
 my $filter = $custom_filter ? qr/$custom_filter/i : qr/\.jpg$/i;
 push($stash{items}->@*, map {
   my ($w, $h) = imgsize($_->stringify);
+  my $fname = $_->basename;
+  my $descr = $lcfg->{captions}{$fname} // undef;
+  my %e = ( width => $w, height => $h, name => $fname, type => 'image' );
+  $e{descr} = $descr if $descr;
   {
     path => $_,
     width => $w, height => $h,
-    strg => to_json(
-      { width => $w, height => $h, name => $_->basename, type => 'image' }
-    )
+    strg => to_json(\%e)
   }
 } sort { lc($a) cmp lc($b) } $dir->children($filter));
 
