@@ -58,9 +58,8 @@ push($stash{items}->@*, map {
   {
     path => $_,
     width => $w, height => $h,
-    strg => sprintf(
-      '{width:%d,height:%d,name:"%s",type:"image"}',
-      $w, $h, $_->basename
+    strg => to_json(
+      { width => $w, height => $h, name => $_->basename, type => 'image' }
     )
   }
 } sort { lc($a) cmp lc($b) } $dir->children($filter));
@@ -68,8 +67,8 @@ push($stash{items}->@*, map {
 # make a list of videos (at this moment only fixed 16:9 aspect)
 push($stash{items}->@*, map {{
   width => 1920, height => 1080, path => $_,
-  strg => sprintf(
-    '{width:%d,height:%d,name:"%s",type:"video"}', 1920, 1080, $_->basename
+  strg => to_json(
+    { width => 1920, height => 1080, name => $_->basename, type => 'video' }
   )
 }} sort { lc($a) cmp lc($b) } $dir->children(qr/\.mp4$/i));
 
