@@ -190,7 +190,7 @@ function gallery(images)
   const boxes = [];
   let layout;
   let jlconfig = typeof config !== 'undefined' ? config.jlconfig : {};
-  let inhibitKeys = false;
+  let browseMode = false;
 
   // navigation actions
   function navigate(action) {
@@ -225,7 +225,7 @@ function gallery(images)
 
   // handle keyboard control, when in browsing mode, we just do nothing
   document.addEventListener('keydown', evt => {
-    if(inhibitKeys) return;
+    if(browseMode) return;
     switch (evt.code) {
       case 'ArrowRight': { evt.preventDefault(); navigate('next') }; break;
       case 'ArrowLeft': { evt.preventDefault(); navigate('prev') }; break;
@@ -273,7 +273,7 @@ function gallery(images)
 
   // resize handler
   let resize = debounce(() => {
-    if(base.clientWidth == viewportWidth) return;
+    if(browseMode || base.clientWidth == viewportWidth) return;
     viewportWidth = base.clientWidth;
     computeLayout();
   });
@@ -283,10 +283,10 @@ function gallery(images)
   base.addEventListener('click', async evt => {
     const n = evt.target.getAttribute('data-n');
     if(n == null) return;
-    inhibitKeys = true;
+    browseMode = true;
     await browser(parseInt(n));
     resize();
-    inhibitKeys = false;
+    browseMode = false;
   });
 
   // put images into DOM
