@@ -275,7 +275,18 @@ function gallery(images)
           window.location.assign('../');
         }
       }; break;
+      case 'start': {
+        goBrowse(0);
+      }; break;
     }
+  }
+
+  // invoke individual full-viewport image browser
+  async function goBrowse(n) {
+    browseMode = true;
+    await browser(n);
+    resize();
+    browseMode = false;
   }
 
   // handle clicks
@@ -295,6 +306,8 @@ function gallery(images)
       case 'ArrowRight': { evt.preventDefault(); navigate('next') }; break;
       case 'ArrowLeft': { evt.preventDefault(); navigate('prev') }; break;
       case 'Escape': { evt.preventDefault(); navigate('exit') }; break;
+      case 'Digit1': { evt.preventDefault(); navigate('start') }; break;
+      case 'Numpad1': { evt.preventDefault(); navigate('start') }; break;
     }
   });
 
@@ -348,10 +361,7 @@ function gallery(images)
   base.addEventListener('click', async evt => {
     const n = evt.target.getAttribute('data-n');
     if(n == null) return;
-    browseMode = true;
-    await browser(parseInt(n));
-    resize();
-    browseMode = false;
+    goBrowse(parseInt(n));
   });
 
   // put images into DOM

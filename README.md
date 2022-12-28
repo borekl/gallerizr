@@ -126,6 +126,19 @@ Images are captioned under `captions` key in the per-directory configuration:
       }
     }
 
+## Navigating the gallery
+
+In the **gallery mode** apart from the obvious mouse navigation using UI elements
+at the top right you can also use left/right arrow keys to move to previous/next
+gallery in gallery chain (if any). Pressing `1` will start browsing individual
+images at the first image of the current gallery.
+
+In **single-image browsing mode** you navigate either by clicking the viewport
+area: it is divided to thirds where the left third navigates to previous image,
+the centre leaves the browser and returns to the gallery and the right third
+moves to the next image. You can also use left/right arrow keys and Escape for
+the same purpose. Home/End keys move to the first/last image.
+
 ## Notes
 Currently the justified-layout library is loaded from unpkg.org CDN. If you want
 a local file, you need to modify the CGI script itself.
