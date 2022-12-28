@@ -197,7 +197,11 @@ function browser(n)
     // return caption text for current image or empty string if there is no
     // caption
     function getCaptionText(imageNo) {
-      if('captions' in dirinfo && images[imageNo].name in dirinfo.captions) {
+      if(
+        dirinfo
+        && 'captions' in dirinfo
+        && images[imageNo].name in dirinfo.captions
+      ) {
         return dirinfo.captions[images[imageNo].name];
       } else {
         return '';
