@@ -80,39 +80,87 @@ function header_ctl() {
 // returns a promise that resolves when user exits the browser
 function browser(n)
 {
+  const g = document.getElementById('gallery');
+  const b = document.getElementById('browser');
+  const overlay = document.getElementsByClassName('overlay')[0];
+  const imageCaption = document.getElementsByClassName('caption')[0];
+  let view;
+
+  // initialize browser view
+  g.style.display = 'none';
+  document.getElementsByTagName('html').item(0).style.overflowY = 'hidden';
+  b.style.display = 'block';
+
   // save state of the title bar and hide it
   header.saveAndHide();
 
-  return new Promise(async resolve => {
-    const g = document.getElementById('gallery');
-    const b = document.getElementById('browser');
-    let view;
+  // image captions are positioned with following function as I haven't found a
+  // good way to do this in pure CSS; this works by overlaying an absolutely
+  // positioned box over the image and then putting the actual caption inside
+  // this box; since the image coordinates cannot be directly queried (they are
+  // adjusted with the 'object-fit' property), we must calculate them ourselves
+  function recalcOverlay() {
+    const vw = b.clientWidth;
+    const vh = b.clientHeight;
+    const vpAspect = vw / vh;
 
-    // initialize browser view
-    g.style.display = 'none';
-    document.getElementsByTagName('html').item(0).style.overflowY = 'hidden';
-    b.style.display = 'block';
+    const img_w = view.naturalWidth;
+    const img_h = view.naturalHeight;
+    const imgAspect = img_w / img_h;
+
+    const ratio = vpAspect / imgAspect;
+
+    const imgX = ratio < 1 ? 0 : (vw - vw / ratio) / 2;
+    const imgY = ratio > 1 ? 0 : (vh - vh * ratio) / 2;
+    const imgW = ratio < 1 ? vw : vw / ratio;
+    const imgH = ratio > 1 ? vh : vh * ratio;
+
+    overlay.style.left = imgX + "px";
+    overlay.style.top = imgY + "px";
+    overlay.style.width = imgW + "px";
+    overlay.style.height = imgH + "px";
+  }
+
+  // debounced resize handler (FIXME: the trailing-edge debouncer doesn't look
+  // very good in this case)
+  let handleResize = debounce(() => recalcOverlay(), 50);
+
+  // main section as promise
+  return new Promise(async resolve => {
+
     switch_view();
 
     // browser view switching; this is the core image browser function that
     // handles opening a new image/video, switching between images/videos and
-    // finally shuts down the browser when requested; the argument specifies the
-    // numerical index of the image/video the browser shall initialize with
+    // finally shutting down the browser when requested; the argument specifies
+    // the numerical index of the image/video the browser shall initialize with
     function switch_view(to)
     {
       // open view
       if(to == null && view == null) {
+        imageCaption.textContent = getCaptionText(n);
         let tag_to = images[n].type == 'video' ? 'video' : 'img';
         view = document.createElement(tag_to);
-        handle_click(view);
+        if(tag_to == 'img') {
+          view.addEventListener('click', handleClick);
+          overlay.addEventListener('click', handleClick);
+          overlay.style.display = 'flex';
+        } else {
+          overlay.style.display = 'none';
+        }
         document.addEventListener('keydown', handle_keypress);
         if(tag_to == 'video') image.setAttribute('controls', null);
         view.setAttribute('src', images[n].name);
         b.append(view);
+        recalcOverlay();
+        window.addEventListener('resize', handleResize);
         return;
       }
       // close view
       if(to == null && view != null) {
+        imageCaption.textContent = '';
+        overlay.removeEventListener('click', handleClick);
+        window.removeEventListener('resize', handleResize);
         let tag_from = images[n].type == 'video' ? 'video' : 'img';
         b.getElementsByTagName(tag_from).item(0).remove();
         document.removeEventListener('keydown', handle_keypress);
@@ -127,14 +175,33 @@ function browser(n)
       // switching between views
       let tag_from = images[n].type == 'video' ? 'video' : 'img';
       let tag_to = images[to].type == 'video' ? 'video' : 'img';
+      imageCaption.textContent = getCaptionText(to);
       if(tag_from != tag_to) {
         b.getElementsByTagName(tag_from).item(0).remove();
         view = document.createElement(tag_to);
-        if(tag_to == 'video') view.setAttribute('controls', null);
+        if(tag_to == 'img') {
+          view.addEventListener('click', handleClick);
+          overlay.style.display = 'flex';
+        }
+        if(tag_to == 'video') {
+          view.setAttribute('controls', null);
+          overlay.style.display = 'none';
+        }
         b.append(view);
       }
       view.setAttribute('src', images[to].name);
+      recalcOverlay();
       n = to;
+    }
+
+    // return caption text for current image or empty string if there is no
+    // caption
+    function getCaptionText(imageNo) {
+      if('captions' in dirinfo && images[imageNo].name in dirinfo.captions) {
+        return dirinfo.captions[images[imageNo].name];
+      } else {
+        return '';
+      }
     }
 
     // navigational actions
@@ -153,15 +220,13 @@ function browser(n)
     }
 
     // handle mouse navigation
-    function handle_click (el) {
-      el.addEventListener('click', function(evt) {
-        const whereTo = get_band(3, b.clientWidth, evt.clientX);
-        switch (whereTo) {
-          case 0: navigate('prev'); break;
-          case 1: navigate('exit'); break;
-          case 2: navigate('next'); break;
-        }
-      });
+    function handleClick(evt) {
+      const whereTo = get_band(3, b.clientWidth, evt.clientX);
+      switch (whereTo) {
+        case 0: navigate('prev'); break;
+        case 1: navigate('exit'); break;
+        case 2: navigate('next'); break;
+      }
     }
 
     // handle keyboard navigation

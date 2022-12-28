@@ -113,6 +113,19 @@ can navigate to. `exit` specifies, if the user can exit the gallery -- if this
 is activated, the parent dir is navigated to (which is expected to have index
 of some sort, like index.html)
 
+### Image captions
+
+It is possible to have image captions (but not video captions). These captions
+will only show in the single-image browsing mode, not in the tiled gallery view.
+Images are captioned under `captions` key in the per-directory configuration:
+
+    {
+      "captions": {
+        "img_1286.jpg": "Some pretty nice mountain view",
+        "img_1287.jpg": "Jane and Mary at the top of the mountain"
+      }
+    }
+
 ## Notes
 Currently the justified-layout library is loaded from unpkg.org CDN. If you want
 a local file, you need to modify the CGI script itself.

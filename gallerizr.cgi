@@ -194,7 +194,11 @@ __DATA__
   </header>
 
   <div id="gallery"></div>
-  <div id="browser"></div>
+  <div id="browser">
+    <div class="overlay">
+      <figcaption class="caption"></figcaption>
+    </div>
+  </div>
 
 </body>
 
