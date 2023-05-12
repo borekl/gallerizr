@@ -53,7 +53,7 @@ printf("Processed %d directories\n", scalar(@dirs));
 printf("Found %d images and %d videos\n", $total_images, $total_videos);
 
 # sort the directories
-@dirs = sort { $b <=> $a } @dirs;
+@dirs = sort { $b cmp $a } @dirs;
  
 # save gset
 $p->child('gset.json')->spew_raw(
