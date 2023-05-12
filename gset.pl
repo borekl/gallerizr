@@ -2,7 +2,6 @@
 
 use warnings;
 use strict;
-
 use feature qw(say);
 
 use Path::Tiny qw(path cwd);
@@ -13,8 +12,9 @@ my (@dirs, %dirinfo);
 my $total_images = 0;
 my $total_videos = 0;
 
-# initialize
-my $p = $ARGV[0] ? path $ARGV[0] : cwd;
+# directory to be processed, either supplied on the commandline or current
+# directory if none
+my $p = path($ARGV[0] // cwd);
 say 'Base path is ', $p;
 
 # iterate over files
