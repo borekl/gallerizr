@@ -149,7 +149,6 @@ function browser(n)
           overlay.style.display = 'none';
         }
         document.addEventListener('keydown', handle_keypress);
-        if(tag_to == 'video') image.setAttribute('controls', null);
         view.setAttribute('src', images[n].name);
         b.append(view);
         recalcOverlay();
@@ -363,6 +362,7 @@ function gallery(images)
 
   // click handler (initiate image browsing)
   base.addEventListener('click', async evt => {
+    if(evt.target.tagName == 'VIDEO') return;
     const n = evt.target.getAttribute('data-n');
     if(n == null) return;
     goBrowse(parseInt(n));
