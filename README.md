@@ -4,7 +4,7 @@
 Dynamically create a browseable gallery out of a directory of images and videos.
 
 Gallerizr is a script that turns a directory of images into a simple web gallery
-(example shown). It tiles the images useing Flickr's
+(example shown). It tiles the images using Flickr's
 [justified-content](http://flickr.github.io/justified-layout/) module and it
 also allows browsing individual images with both mouse and keyboard navigation.
 The gallery generation is fully dynamic: Just create a directory, copy images
