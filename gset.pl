@@ -46,8 +46,13 @@ while (my $r = $iter->()) {
   $total_videos += $data{videos} // 0;
 
   # thumbnails
-  $data{thumb}{src} = "$dir/thumb.2x.jpg";
-  $data{thumb}{srcset} = "$dir/thumb.1x.jpg 1x, $dir/thumb.2x.jpg 2x";
+  foreach my $thumb_file (qw(thumb thumb.2x thumb.1x)) {
+    if($r->child("$thumb_file.jpg")->is_file) {
+      $data{thumb}{src} = "$dir/$thumb_file.jpg";
+      last;
+    }
+  }
+  die "No thumbnail in $dir" unless $data{thumb}{src};
 
   # save data
   $dirinfo{$dir} = \%data;
