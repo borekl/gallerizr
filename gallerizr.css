@@ -106,7 +106,7 @@ nav {
 #browser {
   display: none;
   margin: 0;
-  height: 100vh;
+  height: 100dvh;
 }
 
 #browser img, #browser video {
